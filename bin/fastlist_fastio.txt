@@ -1,0 +1,1 @@
+See https://github.com/trcrsired/fastlist/blob/master/fastlist_fastio.cpp

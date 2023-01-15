@@ -2,8 +2,6 @@
 #include <windows.h>
 #include <tlhelp32.h>
 
-C_ASSERT(sizeof(size_t) == 8);
-
 #define PATH_MAX_LEN (4 * MAX_PATH)
 #define DWORD_MAX 4294967295
 #define DWORD_MAX_LEN 10
@@ -62,14 +60,9 @@ void start(void) {
       __builtin_unreachable();
    }
 
-   SYSTEM_INFO sys_info;
-   GetSystemInfo(&sys_info);
-   // let's just allocate 20 pages of memory to be on the safe side.
-   // that means that once that memory is used, it's flushed and reused
-   // this is about 40 KB which isn't actually that much if you think about
-   // it.
-   DWORD iobuf_sz = sys_info.dwPageSize * 20;
-   char *const iobuf = VirtualAlloc(
+   // 16 pages of memory / 64 KiB
+   #define iobuf_sz 0x10000
+   char *const restrict iobuf = VirtualAlloc(
       NULL,
       iobuf_sz,
       MEM_COMMIT | MEM_RESERVE,
@@ -89,7 +82,6 @@ void start(void) {
             __builtin_unreachable();
          }
          offset = 0;
-         WriteFile(hStdout, "flush\n", 6, NULL, NULL);
       }
 
       offset += dwToChars(entry.th32ProcessID, iobuf + offset);

@@ -24,8 +24,11 @@ bench: bin/smallist.exe
 output: bin/smallist.exe
 	bin\smallist > $@.txt
 
-build: bin/smallist.exe
+build: bin/smallist.exe bin/smallist32.exe
 	-
 
 bin/smallist.exe: smallist.c
 	clang $< $(cflags) -o $@
+
+bin/smallist32.exe: smallist.c
+	clang $< -m32 $(cflags) -o $@
