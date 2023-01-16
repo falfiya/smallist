@@ -27,8 +27,8 @@ output: bin/smallist.exe
 build: bin/smallist.exe bin/smallist32.exe
 	-
 
-bin/smallist.exe: smallist.c
+bin/smallist.exe: smallist.c Makefile
 	clang $< $(cflags) -o $@
 
-bin/smallist32.exe: smallist.c
+bin/smallist32.exe: smallist.c Makefile
 	clang $< -m32 $(cflags) -o $@
