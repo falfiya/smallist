@@ -6,34 +6,20 @@
 #define DWORD_MAX 4294967295
 #define DWORD_MAX_LEN 10
 
+#define UNLIKELY(prop) __builtin_expect(prop, 0)
+#define LIKELY(prop) __builtin_expect(prop, 1)
+
 // returns the length
 DWORD dwToChars(DWORD dw, char *out) {
-   DWORD length;
-   if (dw > 1000000000) {
-      length = 10;
-   } else if (dw >= 100000000) {
-      length = 9;
-   } else if (dw >= 10000000) {
-      length = 8;
-   } else if (dw >= 1000000) {
-      length = 7;
-   } else if (dw >= 100000) {
-      length = 6;
-   } else if (dw >= 10000) {
-      length = 5;
-   } else if (dw >= 1000) {
-      length = 4;
-   } else if (dw >= 100) {
-      length = 3;
-   } else if (dw >= 10) {
-      length = 2;
-   } else {
-      *out = '0' + dw;
-      return 1;
+   DWORD length = 1;
+   DWORD mul_10 = 10;
+   while (LIKELY(dw >= mul_10)) {
+      length++;
+      mul_10 *= 10;
    }
 
    out += length;
-   while (dw > 0) {
+   while (LIKELY(dw > 0)) {
       out--;
       *out = '0' + dw % 10;
       dw /= 10;
@@ -45,7 +31,7 @@ DWORD dwToChars(DWORD dw, char *out) {
 void start(void) {
    HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
    HANDLE snap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-   if (hStdout == INVALID_HANDLE_VALUE || snap == INVALID_HANDLE_VALUE) {
+   if (UNLIKELY(hStdout == INVALID_HANDLE_VALUE || snap == INVALID_HANDLE_VALUE)) {
       ExitProcess(1);
       __builtin_unreachable();
    }
@@ -53,9 +39,8 @@ void start(void) {
    PROCESSENTRY32W entry;
    entry.dwSize = sizeof(PROCESSENTRY32W);
 
-   if (!Process32FirstW(snap, &entry)) {
-      // let's let Windows close it for us
-      //CloseHandle(snap);
+   if (UNLIKELY(!Process32FirstW(snap, &entry))) {
+      CloseHandle(snap);
       ExitProcess(1);
       __builtin_unreachable();
    }
@@ -76,8 +61,9 @@ void start(void) {
          + DWORD_MAX_LEN + 1
          + PATH_MAX_LEN + 1;
 
-      if (offset + max_size > iobuf_sz) {
-         if (!WriteFile(hStdout, iobuf, offset, NULL, NULL)) {
+      if (UNLIKELY(offset + max_size > iobuf_sz)) {
+         if (UNLIKELY(!WriteFile(hStdout, iobuf, offset, NULL, NULL))) {
+            CloseHandle(snap);
             ExitProcess(1);
             __builtin_unreachable();
          }
@@ -100,14 +86,15 @@ void start(void) {
          NULL
       ) - 1; // minus one because of the null byte
       iobuf[offset] = '\n'; offset += 1;
-   } while (Process32NextW(snap, &entry));
+   } while (LIKELY(Process32NextW(snap, &entry)));
 
-   if (!WriteFile(hStdout, iobuf, offset, NULL, NULL)) {
+   if (UNLIKELY(!WriteFile(hStdout, iobuf, offset, NULL, NULL))) {
+      CloseHandle(snap);
       ExitProcess(1);
       __builtin_unreachable();
    }
-   // let's let Windows close it for us
-   //CloseHandle(snap);
+
+   CloseHandle(snap);
    ExitProcess(0);
    __builtin_unreachable();
 }

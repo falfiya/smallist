@@ -18,13 +18,13 @@ cflags += -Xlinker /nodefaultlib
 cflags += -Xlinker /subsystem:console
 cflags += -Xlinker /libpath:"$(libpath)"
 
-bench: bin/smallist.exe
-	$@
+bench: bin/smallist.exe bin/smallist32.exe
+	@$@
 
 output: bin/smallist.exe
 	bin\smallist > $@.txt
 
-build: bin/smallist.exe bin/smallist32.exe
+build: bin/smallist.exe bin/smallist32.exe sizes
 	-
 
 bin/smallist.exe: smallist.c Makefile
@@ -32,3 +32,6 @@ bin/smallist.exe: smallist.c Makefile
 
 bin/smallist32.exe: smallist.c Makefile
 	clang $< -m32 $(cflags) -o $@
+
+sizes:
+	dir /N bin\*list*.exe
