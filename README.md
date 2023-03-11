@@ -20,8 +20,8 @@ Runs Name                      Elapsed Time   Process Time    System   Context  
 ```
 2023.01.15  06:08 PM           271,872 fastlist-0.3.0-x64.exe
 2023.01.15  06:39 PM             5,632 fastlist_fastio.exe
-2023.03.10  06:21 PM             1,712 smallist.exe
-2023.03.10  06:21 PM             1,600 smallist32.exe
+2023.03.10  06:30 PM             1,712 smallist.exe
+2023.03.10  06:30 PM             1,584 smallist32.exe
 ```
 
 For each process, `smallist` prints the process id, the parent process id, and
@@ -38,7 +38,3 @@ the executable file path, each separated by a tab.
 856     784     services.exe
 876     784     lsass.exe
 ```
-
-## development
-
-Run `make build` to build `smallist.exe`. The resulting binary will be in `bin`.

@@ -6,13 +6,25 @@
 #define DWORD_MAX 4294967295
 #define DWORD_MAX_LEN 10
 
+#if 1
+// pay a penalty of 16 bytes for these
 #define UNLIKELY(prop) __builtin_expect(prop, 0)
 #define LIKELY(prop) __builtin_expect(prop, 1)
+#else
+#define UNLIKELY(prop) prop
+#define LIKELY(prop) prop
+#endif
 
 // returns the length
 DWORD dwToChars(DWORD dw, char *out) {
    DWORD length = 1;
    DWORD mul_10 = 10;
+
+   if (UNLIKELY(dw == 0)) {
+      *out = '0';
+      return 1;
+   }
+
    while (LIKELY(dw >= mul_10)) {
       length++;
       mul_10 *= 10;
