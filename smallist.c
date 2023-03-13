@@ -6,6 +6,9 @@
 #define DWORD_MAX 4294967295
 #define DWORD_MAX_LEN 10
 
+// comment this out to enable closing handles (pay 28 bytes)
+#define CloseHandle(_)
+
 #if 1
 // pay a penalty of 16 bytes for these
 #define UNLIKELY(prop) __builtin_expect(prop, 0)
