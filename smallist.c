@@ -7,6 +7,7 @@
 #define DWORD_MAX_LEN 10
 
 // comment this out to enable closing handles (pay 28 bytes)
+// this does nothing because all handles are closed when the process exists
 #define CloseHandle(_)
 
 #if 1
